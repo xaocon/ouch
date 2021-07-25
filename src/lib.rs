@@ -1,18 +1,18 @@
 // Public modules
+pub mod archive;
 pub mod cli;
 pub mod commands;
 pub mod oof;
 
 // Private modules
-mod compressors;
-mod decompressors;
 mod dialogs;
 mod error;
-mod extension;
 mod file;
 mod utils;
 
 pub use error::{Error, Result};
+
+pub const EXIT_FAILURE: i32 = 127;
 
 const VERSION: &str = "0.1.5";
 

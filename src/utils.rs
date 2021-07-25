@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{dialogs::Confirmation, extension::CompressionFormat, file::File, oof};
+use crate::{dialogs::Confirmation, oof};
 
 #[macro_export]
 #[cfg(debug_assertions)]
@@ -23,35 +23,7 @@ macro_rules! debug {
     };
 }
 
-pub fn ensure_exists(path: impl AsRef<Path>) -> crate::Result<()> {
-    let exists = path.as_ref().exists();
-    if !exists {
-        return Err(crate::Error::FileNotFound(PathBuf::from(path.as_ref())));
-    }
-    Ok(())
-}
-
-pub fn check_for_multiple_files(
-    files: &[PathBuf],
-    format: &CompressionFormat,
-) -> crate::Result<()> {
-    if files.len() != 1 {
-        eprintln!(
-            "{}[ERROR]{} cannot compress multiple files directly to {:#?}.\n\
-               Try using an intermediate archival method such as Tar.\n\
-               Example: filename.tar{}",
-            colors::red(),
-            colors::reset(),
-            format,
-            format
-        );
-        return Err(crate::Error::InvalidInput);
-    }
-
-    Ok(())
-}
-
-pub fn create_path_if_non_existent(path: &Path) -> crate::Result<()> {
+pub fn create_dir_if_non_existent(path: &Path) -> crate::Result<()> {
     if !path.exists() {
         println!(
             "{}[INFO]{} attempting to create folder {:?}.",
@@ -59,7 +31,7 @@ pub fn create_path_if_non_existent(path: &Path) -> crate::Result<()> {
             colors::reset(),
             &path
         );
-        std::fs::create_dir_all(path)?;
+        fs::create_dir_all(path)?;
         println!(
             "{}[INFO]{} directory {:#?} created.",
             colors::yellow(),
@@ -70,18 +42,7 @@ pub fn create_path_if_non_existent(path: &Path) -> crate::Result<()> {
     Ok(())
 }
 
-pub fn get_destination_path<'a>(dest: &'a Option<File>) -> &'a Path {
-    match dest {
-        Some(output_file) => {
-            // Must be None according to the way command-line arg. parsing in Ouch works
-            assert_eq!(output_file.extension, None);
-            Path::new(&output_file.path)
-        },
-        None => Path::new("."),
-    }
-}
-
-pub fn change_dir_and_return_parent(filename: &Path) -> crate::Result<PathBuf> {
+pub fn cd_into_same_dir_as(filename: &Path) -> crate::Result<PathBuf> {
     let previous_location = env::current_dir()?;
 
     let parent = if let Some(parent) = filename.parent() {
@@ -90,6 +51,8 @@ pub fn change_dir_and_return_parent(filename: &Path) -> crate::Result<PathBuf> {
         return Err(crate::Error::CompressingRootFolder);
     };
 
+    // TODO: fix this error variant, as it is not the only possible error that can
+    // come out of this operation
     env::set_current_dir(parent).ok().ok_or(crate::Error::CompressingRootFolder)?;
 
     Ok(previous_location)
@@ -160,7 +123,7 @@ pub mod colors {
 #[allow(dead_code, non_upper_case_globals)]
 #[cfg(not(target_family = "unix"))]
 pub mod colors {
-    pub fn empty() -> &'static str {
+    pub const fn empty() -> &'static str {
         ""
     }
     pub const reset: fn() -> &'static str = empty;

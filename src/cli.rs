@@ -14,7 +14,7 @@ pub enum Command {
     /// Files to be compressed
     Compress {
         files: Vec<PathBuf>,
-        compressed_output_path: PathBuf,
+        output_path: PathBuf,
     },
     /// Files to be decompressed and their extensions
     Decompress {
@@ -23,24 +23,6 @@ pub enum Command {
     },
     ShowHelp,
     ShowVersion,
-}
-
-/// Calls parse_args_and_flags_from using std::env::args_os ( argv )
-///
-/// This function is also responsible for treating and checking the cli input
-/// Like calling canonicale, checking if it exists.
-pub fn parse_args() -> crate::Result<ParsedArgs> {
-    let args = env::args_os().skip(1).collect();
-    let mut parsed_args = parse_args_from(args)?;
-
-    // If has a list of files, canonicalize them, reporting error if they do now exist
-    match &mut parsed_args.command {
-        Command::Compress { files, .. } | Command::Decompress { files, .. } => {
-            *files = canonicalize_files(&files)?;
-        },
-        _ => {},
-    }
-    Ok(parsed_args)
 }
 
 #[derive(Debug)]
@@ -80,8 +62,35 @@ fn canonicalize_files(files: &[impl AsRef<Path>]) -> crate::Result<Vec<PathBuf>>
     files.iter().map(canonicalize).collect()
 }
 
+/// Calls parse_args_and_flags_from using argv (std::env::args_os)
+///
+/// This function is also responsible for treating and checking the cli input
+/// Like calling canonicale, checking if it exists.
+pub fn parse_args() -> crate::Result<ParsedArgs> {
+    // From argv, but ignoring empty arguments
+    let args = env::args_os().skip(1).filter(|arg| !arg.is_empty()).collect();
+    let mut parsed_args = parse_args_from(args)?;
+
+    // If has a list of files, canonicalize them, reporting error if they do not exist
+    match &mut parsed_args.command {
+        Command::Compress { files, .. } | Command::Decompress { files, .. } => {
+            *files = canonicalize_files(files)?;
+        },
+        _ => {},
+    }
+
+    if parsed_args.flags.is_present("yes") && parsed_args.flags.is_present("no") {
+        todo!("conflicting flags.");
+    }
+
+    Ok(parsed_args)
+}
+
 pub fn parse_args_from(mut args: Vec<OsString>) -> crate::Result<ParsedArgs> {
+    dbg!(&args);
+
     if oof::matches_any_arg(&args, &["--help", "-h"]) || args.is_empty() {
+        dbg!(&"asjdnk");
         return Ok(ParsedArgs { command: Command::ShowHelp, flags: oof::Flags::default() });
     }
 
@@ -103,9 +112,9 @@ pub fn parse_args_from(mut args: Vec<OsString>) -> crate::Result<ParsedArgs> {
             }
 
             // Safety: we checked that args.len() >= 2
-            let compressed_output_path = files.pop().unwrap();
+            let output_path = files.pop().unwrap();
 
-            let command = Command::Compress { files, compressed_output_path };
+            let command = Command::Compress { files, output_path };
             ParsedArgs { command, flags }
         },
         // Defaults to decompression when there is no subcommand

@@ -8,28 +8,98 @@ use ouch::{cli::Command, commands::run, oof};
 use rand::{rngs::SmallRng, RngCore, SeedableRng};
 use tempdir::TempDir;
 
+// #[test]
+// /// Tests each format that supports multiple files with random input.
+// /// TODO: test the remaining formats.
+// /// TODO2: Fix testing of .tar.zip and .zip.zip
+// fn test_each_format() {
+//     let mut rng = SmallRng::from_entropy();
+//     test_compression_and_decompression(&mut rng, "tar");
+//     test_compression_and_decompression(&mut rng, "tar.gz");
+//     test_compression_and_decompression(&mut rng, "tar.bz");
+//     test_compression_and_decompression(&mut rng, "tar.bz2");
+//     test_compression_and_decompression(&mut rng, "tar.xz");
+//     test_compression_and_decompression(&mut rng, "tar.lz");
+//     test_compression_and_decompression(&mut rng, "tar.lzma");
+//     // test_compression_and_decompression(&mut rng, "tar.zip");
+//     test_compression_and_decompression(&mut rng, "zip");
+//     test_compression_and_decompression(&mut rng, "zip.gz");
+//     test_compression_and_decompression(&mut rng, "zip.bz");
+//     test_compression_and_decompression(&mut rng, "zip.bz2");
+//     test_compression_and_decompression(&mut rng, "zip.xz");
+//     test_compression_and_decompression(&mut rng, "zip.lz");
+//     test_compression_and_decompression(&mut rng, "zip.lzma");
+//     // test_compression_and_decompression(&mut rng, "zip.zip");
+// }
+
 #[test]
-/// Tests each format that supports multiple files with random input.
-/// TODO: test the remaining formats.
-/// TODO2: Fix testing of .tar.zip and .zip.zip
-fn test_each_format() {
-    let mut rng = SmallRng::from_entropy();
-    test_compression_and_decompression(&mut rng, "tar");
-    test_compression_and_decompression(&mut rng, "tar.gz");
-    test_compression_and_decompression(&mut rng, "tar.bz");
-    test_compression_and_decompression(&mut rng, "tar.bz2");
-    test_compression_and_decompression(&mut rng, "tar.xz");
-    test_compression_and_decompression(&mut rng, "tar.lz");
-    test_compression_and_decompression(&mut rng, "tar.lzma");
-    // test_compression_and_decompression(&mut rng, "tar.zip");
-    test_compression_and_decompression(&mut rng, "zip");
-    test_compression_and_decompression(&mut rng, "zip.gz");
-    test_compression_and_decompression(&mut rng, "zip.bz");
-    test_compression_and_decompression(&mut rng, "zip.bz2");
-    test_compression_and_decompression(&mut rng, "zip.xz");
-    test_compression_and_decompression(&mut rng, "zip.lz");
-    test_compression_and_decompression(&mut rng, "zip.lzma");
-    // test_compression_and_decompression(&mut rng, "zip.zip");
+fn test_compression_and_decompression_tar() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar");
+}
+
+#[test]
+fn test_compression_and_decompression_tar_gz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar.gz");
+}
+
+#[test]
+fn test_compression_and_decompression_tar_bz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar.bz");
+}
+
+#[test]
+fn test_compression_and_decompression_tar_bz2() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar.bz2");
+}
+
+#[test]
+fn test_compression_and_decompression_tar_xz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar.xz");
+}
+
+#[test]
+fn test_compression_and_decompression_tar_lz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar.lz");
+}
+
+#[test]
+fn test_compression_and_decompression_tar_lzma() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "tar.lzma");
+}
+
+#[test]
+fn test_compression_and_decompression_zip() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip");
+}
+
+#[test]
+fn test_compression_and_decompression_zip_gz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip.gz");
+}
+
+#[test]
+fn test_compression_and_decompression_zip_bz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip.bz");
+}
+
+#[test]
+fn test_compression_and_decompression_zip_bz2() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip.bz2");
+}
+
+#[test]
+fn test_compression_and_decompression_zip_xz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip.xz");
+}
+
+#[test]
+fn test_compression_and_decompression_zip_lz() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip.lz");
+}
+
+#[test]
+fn test_compression_and_decompression_zip_lzma() {
+    test_compression_and_decompression(&mut SmallRng::from_entropy(), "zip.lzma");
 }
 
 type FileContent = Vec<u8>;
@@ -50,6 +120,7 @@ fn test_compression_and_decompression(rng: &mut impl RngCore, format: &str) {
         (0..quantity_of_files).map(|_| generate_random_file_content(rng)).collect();
 
     let mut file_paths = create_files(&testing_dir, &contents_of_files);
+    println!("am i here?");
     let archive_path = compress_files(&testing_dir, &file_paths, &format);
     let mut extracted_paths = extract_files(&archive_path);
 
@@ -92,7 +163,7 @@ fn compress_files(at: &Path, paths_to_compress: &[PathBuf], format: &str) -> Pat
 
     let command = Command::Compress {
         files: paths_to_compress.to_vec(),
-        compressed_output_path: archive_path.to_path_buf(),
+        output_path: archive_path.to_path_buf(),
     };
     run(command, &oof::Flags::default()).expect("Failed to compress test dummy files");
 
