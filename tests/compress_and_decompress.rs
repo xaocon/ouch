@@ -8,26 +8,73 @@ use ouch::{cli::Command, commands::run, oof};
 use rand::{rngs::SmallRng, RngCore, SeedableRng};
 
 #[test]
-/// Tests each format that supports multiple files with random input.
-/// TODO: test the remaining formats.
-fn test_each_format() {
+fn test_compressing_and_decompressing_archive_tar() {
     test_compressing_and_decompressing_archive("tar");
-    test_compressing_and_decompressing_archive("tar.gz");
-    test_compressing_and_decompressing_archive("tar.bz");
-    test_compressing_and_decompressing_archive("tar.bz2");
-    test_compressing_and_decompressing_archive("tar.xz");
-    test_compressing_and_decompressing_archive("tar.lz");
-    test_compressing_and_decompressing_archive("tar.lzma");
-    test_compressing_and_decompressing_archive("zip");
-    test_compressing_and_decompressing_archive("zip.gz");
-    test_compressing_and_decompressing_archive("zip.bz");
-    test_compressing_and_decompressing_archive("zip.bz2");
-    test_compressing_and_decompressing_archive("zip.xz");
-    test_compressing_and_decompressing_archive("zip.lz");
-    test_compressing_and_decompressing_archive("zip.lzma");
+}
 
-    // Why not
-    test_compressing_and_decompressing_archive("tar.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.gz.lz.lz.lz.lz.lz.lz.lz.lz.lz.lz.bz.bz.bz.bz.bz.bz.bz");
+#[test]
+fn test_compressing_and_decompressing_archive_tar_gz() {
+    test_compressing_and_decompressing_archive("tar.gz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_tar_bz() {
+    test_compressing_and_decompressing_archive("tar.bz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_tar_bz2() {
+    test_compressing_and_decompressing_archive("tar.bz2");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_tar_xz() {
+    test_compressing_and_decompressing_archive("tar.xz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_tar_lz() {
+    test_compressing_and_decompressing_archive("tar.lz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_tar_lzma() {
+    test_compressing_and_decompressing_archive("tar.lzma");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip() {
+    test_compressing_and_decompressing_archive("zip");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip_gz() {
+    test_compressing_and_decompressing_archive("zip.gz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip_bz() {
+    test_compressing_and_decompressing_archive("zip.bz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip_bz2() {
+    test_compressing_and_decompressing_archive("zip.bz2");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip_xz() {
+    test_compressing_and_decompressing_archive("zip.xz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip_lz() {
+    test_compressing_and_decompressing_archive("zip.lz");
+}
+
+#[test]
+fn test_compressing_and_decompressing_archive_zip_lzma() {
+    test_compressing_and_decompressing_archive("zip.lzma");
 }
 
 type FileContent = Vec<u8>;
@@ -37,9 +84,12 @@ fn test_compressing_and_decompressing_archive(format: &str) {
     // System temporary directory depends on the platform, for linux it's /tmp
     let system_tmp = env::temp_dir();
 
+    let testing_dir_prefix = format!("ouch-testing-{}", format.replace('.', "-"));
+    dbg!(&testing_dir_prefix);
+
     // Create a temporary testing folder that will be deleted on scope drop
     let testing_dir = tempfile::Builder::new()
-        .prefix("ouch-testing")
+        .prefix(&testing_dir_prefix)
         .tempdir_in(system_tmp)
         .expect("Could not create testing_dir");
     let testing_dir_path = testing_dir.path();
