@@ -51,36 +51,31 @@ impl fmt::Display for Extension {
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 /// Accepted extensions for input and output
 pub enum CompressionFormat {
+    /// tar, tgz, tbz, tbz2, txz, tlz4, tlzma, tsz, tzst
+    Tar,
+    /// .zip
+    Zip,
     /// .gz
     Gzip,
     /// .bz .bz2
     Bzip,
+    /// .bz3
+    Bzip3,
     /// .lz4
     Lz4,
     /// .xz .lzma
     Lzma,
     /// .sz
     Snappy,
-    /// tar, tgz, tbz, tbz2, txz, tlz4, tlzma, tsz, tzst
-    Tar,
     /// .zst
     Zstd,
-    /// .zip
-    Zip,
 }
 
 impl CompressionFormat {
-    /// Currently supported archive formats are .tar (and aliases to it) and .zip
     fn is_archive_format(&self) -> bool {
-        // Keep this match like that without a wildcard `_` so we don't forget to update it
         match self {
             Tar | Zip => true,
-            Gzip => false,
-            Bzip => false,
-            Lz4 => false,
-            Lzma => false,
-            Snappy => false,
-            Zstd => false,
+            Bzip | Bzip3 | Gzip | Lz4 | Lzma | Snappy | Zstd => false,
         }
     }
 }
