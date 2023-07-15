@@ -111,9 +111,9 @@ Output:
 
 # Supported formats
 
-| Format    | `.tar` | `.zip` | `.gz` | `.xz`, `.lzma` | `.bz`, `.bz2` | `.lz4` | `.sz` | `.zst` |
+| Format    | `.tar` | `.zip` | `.gz` | `.xz`, `.lzma` | `.bz`, `.bz2` | `.bz3` | `.lz4` | `.sz` | `.zst` |
 |:---------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| Supported | ✓ | ✓¹ | ✓² | ✓ | ✓ | ✓ | ✓² | ✓ |
+| Supported | ✓ | ✓¹ | ✓² | ✓ | ✓ | ✓ | ✓ | ✓² | ✓ |
 
 ✓: Supports compression and decompression.
 

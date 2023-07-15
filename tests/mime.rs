@@ -16,40 +16,36 @@ fn sanity_check_through_mime() {
     let test_file = &mut NamedTempFile::new_in(temp_dir_path).expect("to be able to build a temporary file");
     write_random_content(test_file, &mut SmallRng::from_entropy());
 
-    let formats = [
-        "tar", "zip", "tar.gz", "tgz", "tbz", "tbz2", "txz", "tlzma", "tzst", "tar.bz", "tar.bz2", "tar.lzma",
-        "tar.xz", "tar.zst",
+    let formats_and_expected_mimes = [
+        ("tar", Some("application/x-tar")),
+        ("zip", Some("application/zip")),
+        ("tar.gz", Some("application/gzip")),
+        ("tgz", Some("application/gzip")),
+        ("tbz", Some("application/x-bzip2")),
+        ("tbz2", Some("application/x-bzip2")),
+        ("txz", Some("application/x-xz")),
+        ("tlzma", Some("application/x-xz")),
+        ("tzst", Some("application/zstd")),
+        ("tar.bz", Some("application/x-bzip2")),
+        ("tar.bz2", Some("application/x-bzip2")),
+        ("tar.lzma", Some("application/x-xz")),
+        ("tar.xz", Some("application/x-xz")),
+        ("tar.zst", Some("application/zstd")),
+        ("tar.bz3", None),
     ];
 
-    let expected_mimes = [
-        "application/x-tar",
-        "application/zip",
-        "application/gzip",
-        "application/gzip",
-        "application/x-bzip2",
-        "application/x-bzip2",
-        "application/x-xz",
-        "application/x-xz",
-        "application/zstd",
-        "application/x-bzip2",
-        "application/x-bzip2",
-        "application/x-xz",
-        "application/x-xz",
-        "application/zstd",
-    ];
-
-    assert_eq!(formats.len(), expected_mimes.len());
-
-    for (format, expected_mime) in formats.iter().zip(expected_mimes.iter()) {
+    for (format, expected_mime) in formats_and_expected_mimes {
         let path_to_compress = test_file.path();
 
         let compressed_file_path = &format!("{}.{}", path_to_compress.display(), format);
         ouch!("c", path_to_compress, compressed_file_path);
 
-        let sniffed = infer::get_from_path(compressed_file_path)
-            .expect("the file to be read")
-            .expect("the MIME to be found");
+        let sniffed = infer::get_from_path(compressed_file_path).expect("Missing file to check mime from");
 
-        assert_eq!(&sniffed.mime_type(), expected_mime);
+        let mime = sniffed.as_ref().map(|sniffed| sniffed.mime_type());
+        assert_eq!(
+            mime, expected_mime,
+            "Expected the mime {expected_mime:?} for the format {format}, but got {mime:?} instead",
+        );
     }
 }

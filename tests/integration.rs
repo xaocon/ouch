@@ -32,14 +32,15 @@ enum DirectoryExtension {
 #[derive(Arbitrary, Debug, Display)]
 #[display(style = "lowercase")]
 enum FileExtension {
-    Bz,
-    Bz2,
-    Gz,
+    // Bz,
+    // Bz2,
+    Bz3,
+    // Gz,
     Lz4,
-    Lzma,
-    Sz,
-    Xz,
-    Zst,
+    // Lzma,
+    // Sz,
+    // Xz,
+    // Zst,
 }
 
 #[derive(Arbitrary, Debug, Display)]

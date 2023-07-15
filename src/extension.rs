@@ -81,13 +81,13 @@ impl CompressionFormat {
 }
 
 pub const SUPPORTED_EXTENSIONS: &[&str] = &[
-    "tar", "tgz", "tbz", "tlz4", "txz", "tzlma", "tsz", "tzst", "zip", "bz", "bz2", "gz", "lz4", "xz", "lzma", "sz",
-    "zst",
+    "tar", "tgz", "tbz", "tlz4", "txz", "tzlma", "tsz", "tzst", "zip", "bz", "bz2", "bz3", "gz", "lz4", "xz", "lzma",
+    "sz", "zst",
 ];
 
-fn to_extension(ext: &[u8]) -> Option<Extension> {
+fn to_extension(bytes: &[u8]) -> Option<Extension> {
     Some(Extension::new(
-        match ext {
+        match dbg!(bytes) {
             b"tar" => &[Tar],
             b"tgz" => &[Tar, Gzip],
             b"tbz" | b"tbz2" => &[Tar, Bzip],
@@ -97,6 +97,7 @@ fn to_extension(ext: &[u8]) -> Option<Extension> {
             b"tzst" => &[Tar, Zstd],
             b"zip" => &[Zip],
             b"bz" | b"bz2" => &[Bzip],
+            b"bz3" => &[Bzip3],
             b"gz" => &[Gzip],
             b"lz4" => &[Lz4],
             b"xz" | b"lzma" => &[Lzma],
@@ -104,7 +105,7 @@ fn to_extension(ext: &[u8]) -> Option<Extension> {
             b"zst" => &[Zstd],
             _ => return None,
         },
-        ext.to_str_lossy(),
+        bytes.to_str_lossy(),
     ))
 }
 

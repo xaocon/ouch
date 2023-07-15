@@ -13,6 +13,8 @@ use crate::{
     QuestionAction, QuestionPolicy, BUFFER_CAPACITY,
 };
 
+const TWO_HUNDRED_MB: usize = 1024 * 1024 * 2;
+
 /// Compress files into `output_file`.
 ///
 /// # Arguments:
@@ -55,6 +57,7 @@ pub fn compress_files(
                 encoder,
                 level.map_or_else(Default::default, |l| bzip2::Compression::new((l as u32).clamp(1, 9))),
             )),
+            Bzip3 => Box::new(bzip3::write::Bz3Encoder::new(encoder, TWO_HUNDRED_MB).unwrap()),
             Lz4 => Box::new(lzzzz::lz4f::WriteCompressor::new(
                 encoder,
                 lzzzz::lz4f::PreferencesBuilder::new()
@@ -96,7 +99,7 @@ pub fn compress_files(
     }
 
     match first_format {
-        Gzip | Bzip | Lz4 | Lzma | Snappy | Zstd => {
+        Bzip | Bzip3 | Gzip | Lz4 | Lzma | Snappy | Zstd => {
             writer = chain_writer_encoder(&first_format, writer)?;
             let mut reader = fs::File::open(&files[0]).unwrap();
 

@@ -206,9 +206,9 @@ dependencies = [
 
 [[package]]
 name = "bzip3"
-version = "0.6.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fff6171e9fadca812c7deaf0b669f56e03cb1165372cda02eefd07ce2af78d6"
+checksum = "58836978325c1252d9661d14e62f8a870fae9f5a0ff1feff88130e6cfb08b64b"
 dependencies = [
  "byteorder",
  "bytesize",
