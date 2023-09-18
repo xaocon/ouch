@@ -14,10 +14,10 @@ use crate::{
     cli::Subcommand,
     commands::{compress::compress_files, decompress::decompress_file, list::list_archive_contents},
     error::{Error, FinalError},
-    extension::{self, parse_format},
+    extension::{self, parse_format_flag},
     info,
     list::ListOptions,
-    utils::{self, to_utf, EscapedPathDisplay, FileVisibilityPolicy},
+    utils::{self, path_to_str, EscapedPathDisplay, FileVisibilityPolicy},
     warning, CliArgs, QuestionPolicy,
 };
 
@@ -56,7 +56,7 @@ pub fn run(
             // Formats from path extension, like "file.tar.gz.xz" -> vec![Tar, Gzip, Lzma]
             let (formats_from_flag, formats) = match args.format {
                 Some(formats) => {
-                    let parsed_formats = parse_format(&formats)?;
+                    let parsed_formats = parse_format_flag(&formats)?;
                     (Some(formats), parsed_formats)
                 }
                 None => (None, extension::extensions_from_path(&output_path)),
@@ -99,7 +99,7 @@ pub fn run(
                 // having a final status message is important especially in an accessibility context
                 // as screen readers may not read a commands exit code, making it hard to reason
                 // about whether the command succeeded without such a message
-                info!(accessible, "Successfully compressed '{}'.", to_utf(&output_path));
+                info!(accessible, "Successfully compressed '{}'.", path_to_str(&output_path));
             } else {
                 // If Ok(false) or Err() occurred, delete incomplete file at `output_path`
                 //
@@ -127,7 +127,7 @@ pub fn run(
             let mut formats = vec![];
 
             if let Some(format) = args.format {
-                let format = parse_format(&format)?;
+                let format = parse_format_flag(&format)?;
                 for path in files.iter() {
                     let file_name = path.file_name().ok_or_else(|| Error::NotFound {
                         error_title: format!("{} does not have a file name", EscapedPathDisplay::new(path)),
@@ -179,7 +179,7 @@ pub fn run(
             let mut formats = vec![];
 
             if let Some(format) = args.format {
-                let format = parse_format(&format)?;
+                let format = parse_format_flag(&format)?;
                 for _ in 0..files.len() {
                     formats.push(format.clone());
                 }

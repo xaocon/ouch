@@ -50,8 +50,9 @@ pub fn run_in(folder: impl AsRef<Path>, bin: impl AsRef<OsStr>, args: &str) -> i
 
 // write random content to a file
 pub fn write_random_content(file: &mut impl Write, rng: &mut impl RngCore) {
-    let mut data = Vec::new();
-    data.resize(rng.gen_range(0..4096), 0);
+    let len = rng.gen_range(0..4096);
+    let mut data = vec![0; len];
+
     rng.fill_bytes(&mut data);
     file.write_all(&data).unwrap();
 }
