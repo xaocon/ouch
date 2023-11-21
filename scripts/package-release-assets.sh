@@ -3,6 +3,9 @@
 set -e
 
 mkdir release
+
+ls -R artifacts -F
+
 cd artifacts
 
 for dir in ouch-*; do
