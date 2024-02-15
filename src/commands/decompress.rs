@@ -81,7 +81,7 @@ pub fn decompress_file(
     let chain_reader_decoder = |format: &CompressionFormat, decoder: Box<dyn Read>| -> crate::Result<Box<dyn Read>> {
         let decoder: Box<dyn Read> = match format {
             Gzip => Box::new(flate2::read::GzDecoder::new(decoder)),
-            Bzip => Box::new(bzip2::read::BzDecoder::new(decoder)),
+            Bzip => Box::new(bzip2_rs::DecoderReader::new(decoder)),
             Lz4 => Box::new(lz4_flex::frame::FrameDecoder::new(decoder)),
             Lzma => Box::new(xz2::read::XzDecoder::new(decoder)),
             Snappy => Box::new(snap::read::FrameDecoder::new(decoder)),

@@ -14,6 +14,7 @@ description = "A command-line utility for easily compressing and decompressing f
 atty = "0.2.14"
 bstr = { version = "1.9.0", default-features = false, features = ["std"] }
 bzip2 = "0.4.4"
+bzip2-rs = { git = "https://github.com/xaocon/bzip2-rs.git" }
 clap = { version = "4.5.0", features = ["derive", "env"] }
 filetime_creation = "0.2"
 flate2 = { version = "1.0.28", default-features = false }
